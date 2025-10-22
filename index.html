@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu menú según tu analítica</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+  h1 { color: #2c3e50; }
+  label { display: block; margin-top: 15px; }
+  select, button { padding: 8px; margin-top: 5px; width: 100%; max-width: 300px; }
+  #resultado { margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+  ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<h1>Tu menú según tu analítica</h1>
+
+<form id="menuForm">
+  <label for="deficit">¿Qué déficits tienes en tu analítica?</label>
+  <select id="deficit" required>
+    <option value="">Selecciona...</option>
+    <option value="hierro">Solo falta de hierro</option>
+    <option value="b12">Solo falta vitamina B12</option>
+    <option value="folato">Solo falta folato</option>
+    <option value="hierro_folato">Falta hierro y folato</option>
+    <option value="hierro_b12">Falta hierro y vitamina B12</option>
+    <option value="folato_b12">Falta folato y B12</option>
+  </select>
+
+  <label for="riñon">¿Tienes problemas de riñón?</label>
+  <select id="riñon" required>
+    <option value="">Selecciona...</option>
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+  </select>
+
+  <button type="submit">Generar menú</button>
+</form>
+
+<div id="resultado"></div>
+
+<script>
+const menus = {
+  hierro: {
+    normal: {
+      almuerzo: ["Ensalada de espinacas con lentejas", "Pollo a la plancha con arroz integral", "Sardinas con patata cocida", "Ternera guisada con verduras", "Huevos revueltos con espinacas", "Hamburguesa de ternera con ensalada", "Garbanzos con verduras"],
+      cena: ["Tortilla de espinacas", "Sopa de lentejas", "Sardinas al horno", "Pechuga de pollo con verduras", "Ensalada de huevo y espinacas", "Ternera a la plancha con ensalada", "Crema de garbanzos"]
+    },
+    bajo_potasio: {
+      almuerzo: ["Pollo al horno con arroz blanco", "Pescado blanco con verduras bajas en potasio", "Ensalada de arroz con atún", "Pechuga de pavo con calabacín", "Tortilla de claras con verduras", "Pollo a la plancha con judías verdes", "Pasta con pollo y calabacín"],
+      cena: ["Crema de calabacín", "Merluza al horno", "Tortilla de claras con verduras", "Pavo a la plancha con ensalada", "Sopa de arroz con pollo", "Pescado al vapor con verduras", "Pasta con verduras bajas en potasio"]
+    }
+  },
+  folato: {
+    normal: {
+      almuerzo: ["Ensalada de espinacas y garbanzos", "Brócoli con salmón", "Lentejas con verduras", "Ensalada de aguacate y garbanzos", "Sopa de espinacas", "Pasta con verduras y guisantes", "Ensalada de remolacha con lentejas"],
+      cena: ["Crema de espinacas", "Salmón a la plancha con brócoli", "Tortilla de guisantes", "Ensalada de aguacate y verduras", "Lentejas guisadas", "Pasta con espinacas", "Sopa de garbanzos"]
+    },
+    bajo_potasio: {
+      almuerzo: ["Arroz con espinacas", "Pescado blanco con verduras bajas en potasio", "Tortilla de claras con espinacas", "Pasta con verduras bajas en potasio", "Sopa de arroz con verduras", "Pechuga de pollo con calabacín", "Ensalada de arroz con pepino"],
+      cena: ["Crema de calabacín y espinacas", "Merluza al horno con verduras bajas en potasio", "Tortilla de claras", "Ensalada de arroz y verduras", "Sopa de arroz con pollo", "Pasta con calabacín", "Pollo a la plancha con ensalada"]
+    }
+  },
+  b12: {
+    normal: {
+      almuerzo: ["Salmón a la plancha con arroz integral", "Huevos revueltos con verduras", "Pollo al horno con ensalada", "Atún con patatas cocidas", "Ternera guisada con verduras", "Tortilla de huevo con espinacas", "Pasta con pescado"],
+      cena: ["Sopa de pescado", "Tortilla de huevo con verduras", "Salmón al horno con ensalada", "Pollo a la plancha con verduras", "Atún con ensalada", "Ternera a la plancha con ensalada", "Crema de verduras con huevo"]
+    },
+    bajo_potasio: {
+      almuerzo: ["Merluza al horno con arroz blanco", "Tortilla de claras con verduras bajas en potasio", "Pechuga de pollo con calabacín", "Pasta con pescado blanco", "Huevos revueltos con verduras bajas en potasio", "Pollo a la plancha con ensalada baja en potasio", "Pavo al horno con calabacín"],
+      cena: ["Sopa de arroz con pescado", "Tortilla de claras con verduras", "Merluza al vapor con calabacín", "Pechuga de pavo a la plancha con ensalada baja en potasio", "Huevos cocidos con verduras bajas en potasio", "Pollo al horno con calabacín", "Crema de verduras bajas en potasio"]
+    }
+  }
+};
+
+document.getElementById('menuForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const deficit = document.getElementById('deficit').value;
+  const rinon = document.getElementById('riñon').value;
+  const tipo = rinon === "si" ? "bajo_potasio" : "normal";
+
+  let almuerzo = [];
+  let cena = [];
+
+  if(deficit.includes("hierro")) {
+    almuerzo = almuerzo.concat(menus.hierro[tipo].almuerzo);
+    cena = cena.concat(menus.hierro[tipo].cena);
+  }
+  if(deficit.includes("folato")) {
+    almuerzo = almuerzo.concat(menus.folato[tipo].almuerzo);
+    cena = cena.concat(menus.folato[tipo].cena);
+  }
+  if(deficit.includes("b12")) {
+    almuerzo = almuerzo.concat(menus.b12[tipo].almuerzo);
+    cena = cena.concat(menus.b12[tipo].cena);
+  }
+
+  let resultadoHTML = "<h2>Menú semanal</h2><h3>Almuerzos:</h3><ul>";
+  almuerzo.forEach(d => resultadoHTML += `<li>${d}</li>`);
+  resultadoHTML += "</ul><h3>Cenas:</h3><ul>";
+  cena.forEach(d => resultadoHTML += `<li>${d}</li>`);
+  resultadoHTML += "</ul>";
+
+  document.getElementById('resultado').innerHTML = resultadoHTML;
+});
+</script>
+</body>
+</html>
